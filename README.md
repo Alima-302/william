@@ -1,96 +1,123 @@
-Employee Payslip Generator and Email Sender
-This project generates PDF payslips for employees and automatically emails them their payslips using Python.
+# Payslip Generator System
 
-Features
-Create personalized PDF payslips for each employee.
+A Python-based system for generating and distributing employee payslips automatically.
 
-Automatically email the generated payslips to employees.
+[![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Calculates net salary (basic salary + allowances - deductions).
+## Table of Contents
 
-Saves all generated payslips in a local folder (Payslips/).
+- [Overview](#overview)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Security Considerations](#security-considerations)
+- [Contributing](#contributing)
+- [License](#license)
 
-Tech Stack
-Python 3
+## Overview
 
-Pandas - for data manipulation.
+This system automates the process of generating and distributing employee payslips through email. It uses pandas for data management, FPDF for PDF generation, and Python's built-in email libraries for secure email distribution.
 
-FPDF - for PDF generation.
+## Features
 
-smtplib, ssl, email - for sending emails.
+- Automatic payslip generation for multiple employees
+- Professional PDF formatting with company branding
+- Secure email distribution with attachments
+- Support for custom email templates
+- Automatic folder organization
+- Salary calculation with allowances and deductions
 
-Installation
-Clone this repository or download the script.
+## Requirements
 
-Install required Python libraries:
+- Python 3.7+
+- Required packages:
+  ```bash
+  pandas
+  fpdf
+  ```
+- Email account with SMTP access
 
-bash
-Copy
-Edit
-pip install pandas fpdf
-Set up your Gmail account:
+## Installation
 
-Use an App Password if you have 2FA enabled on your Gmail account.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/payslip-generator.git
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Update your EMAIL_SENDER and EMAIL_PASSWORD in the script.
+## Usage
 
-Make sure "Less secure app access" is enabled (if not using App Passwords). (App Passwords recommended)
+1. Set up environment variables:
+   ```bash
+   # .env file
+   EMAIL_SENDER=your_email@gmail.com
+   EMAIL_PASSWORD=your_app_password
+   SMTP_SERVER=smtp.gmail.com
+   SMTP_PORT=587
+   COMPANY_NAME=Your Company Name
+   PAYSLIP_FOLDER=payslips
+   ```
 
-How It Works
-Load Employee Data:
+2. Create employee data:
+   ```python
+   df = pd.DataFrame({
+       'Employee ID': ['20-A001', '20-A002'],
+       'Name and Surname': ['John Doe', 'Jane Smith'],
+       'Employee Email': ['john@example.com', 'jane@example.com'],
+       'Basic Salary': [5000, 6000],
+       'Allowances': [500, 600],
+       'Deductions': [100, 150]
+   })
+   ```
 
-A sample employee dataset is created within the script using a pandas DataFrame.
+3. Run the system:
+   ```python
+   from payslip_generator import PayslipGenerator, EmailSender
 
-Each employee has details like ID, name, email, basic salary, allowances, and deductions.
+   # Initialize components
+   config = Config()
+   generator = PayslipGenerator(config)
+   sender = EmailSender(config)
 
-Generate Payslips:
+   # Generate and send payslips
+   for _, employee in df.iterrows():
+       pdf_path = generator.create_payslip_pdf(employee)
+       sender.send_payslip(employee['Employee Email'], pdf_path)
+   ```
 
-For each employee, a PDF payslip is generated summarizing their salary details.
+## Configuration
 
-Payslips are saved in the Payslips/ directory.
+The system uses environment variables for configuration. Create a `.env` file in the project root with your settings.
 
-Send Payslips via Email:
+### Email Configuration
 
-Each employee (with a valid email) receives their payslip as an email attachment.
+- `EMAIL_SENDER`: Your email address
+- `EMAIL_PASSWORD`: Your email password (preferably an app password)
+- `SMTP_SERVER`: SMTP server address
+- `SMTP_PORT`: SMTP server port
 
-Error Handling:
+### System Configuration
 
-If an employee email is missing, the script will skip sending an email to them.
+- `COMPANY_NAME`: Your company name
+- `PAYSLIP_FOLDER`: Output folder for generated payslips
 
-Project Structure
-bash
-Copy
-Edit
-.
-├── Payslips/               # Generated payslips saved here
-├── script.py               # Main Python script (your provided code)
-├── README.md               # Project documentation
-Important Notes
-Credentials Safety: Never hard-code real email credentials in your production code. Use environment variables or configuration files.
+## Security Considerations
 
-Email Deliverability: Some emails may land in the Spam folder if sent in bulk.
+1. Email Credentials:
+   - Use environment variables for sensitive information
+   - Never commit credentials to version control
+   - Consider using app passwords instead of regular passwords
 
-Empty Email Addresses: The script gracefully skips employees without an email.
+2. Data Security:
+   - Employee data should be handled according to privacy regulations
+   - PDFs are stored locally in the specified folder
+   - Email attachments are sent securely using TLS
 
-Sample Output
-A PDF payslip will look like:
-
-yaml
-Copy
-Edit
-Alees Company
-PAYSLIP
-
-Name: John Doe
-Employee ID: 20-A001
-Email: john@example.com
-
-Description      Amount ($)
-Basic Salary     500.00
-Allowances       50.00
-Deductions       5.00
-Net Salary       545.00
-
-Thank you for your dedication!
-License
-This project is open-source and free to use!
+3. File System:
+  
